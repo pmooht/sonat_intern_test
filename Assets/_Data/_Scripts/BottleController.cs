@@ -38,7 +38,6 @@ public class BottleController : MonoBehaviour
   public BottleController bottleControllerRef;
   private int numberOfColorsToTransfer = 0;
 
-  [Header("Rotation Points")]
   public Transform leftRotationPoint;
   public Transform rightRotationPoint;
   private Transform chosenRotationPoint;
@@ -49,16 +48,17 @@ public class BottleController : MonoBehaviour
   Vector3 startPosition;
   Vector3 endPosition;
 
-  [Header("Selection Settings")]
   public float selectionHeightOffset = 0.5f;
   public float selectionMoveSpeed = 5f;
   private bool isSelected = false;
   private Vector3 targetPosition;
 
+  public LineRenderer lineRenderer;
 
   // Khởi tạo: set fill shader, lưu vị trí gốc, cập nhật màu và topColor
   void Start()
   {
+    lineRenderer.enabled = false;
     bottleMaskSR.material.SetFloat("_FillAmout", fillAmounts[numberOfColorsInBottle]);
 
     originalPosition = transform.position;
@@ -70,16 +70,13 @@ public class BottleController : MonoBehaviour
 
   void Update()
   {
-    if (!isRotating)
-    {
-      if (transform.position != targetPosition)
+    if (!isRotating && transform.position != targetPosition)
       {
         transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * selectionMoveSpeed);
       }
     }
-  }
 
-  // Đẩy toàn bộ mảng bottleColors lên shader (_C1 → _C4)
+  // Đẩy toàn bộ mảng bottleColors lên shader
   private void UpdateColorsOnShader()
   {
     for (int i = 0; i < maxLayers; i++)
@@ -133,6 +130,27 @@ public class BottleController : MonoBehaviour
       // Chỉ đổ nếu chai nguồn còn đủ chất lỏng hơn ngưỡng dừng
       if (fillAmounts[numberOfColorsInBottle] > FillAmountCurve.Evaluate(angleValue) + 0.005f)
       {
+        // Bật line và set màu — luôn set màu khi bắt đầu rót (tránh màu trắng default)  
+        if (lineRenderer.enabled == false)
+        {
+          // Ép alpha = 1 vì bottleColors lưu với alpha = 0 (shader dùng _FillAmout thay cho alpha)
+          Color lineColor = new Color(topColor.r, topColor.g, topColor.b, 1f);
+          lineRenderer.startColor = lineColor;
+          lineRenderer.endColor = lineColor;
+          lineRenderer.enabled = true;
+        }
+
+        lineRenderer.SetPosition(0, chosenRotationPoint.position);
+
+        float currentFill = bottleControllerRef.bottleMaskSR.material.GetFloat("_FillAmout");
+        Bounds targetBounds = bottleControllerRef.bottleMaskSR.bounds;
+        float liquidBottom = targetBounds.min.y;
+        float liquidTop    = targetBounds.max.y;
+        float normalizedFill = Mathf.InverseLerp(fillAmounts[0], fillAmounts[maxLayers], currentFill);
+        float surfaceY = Mathf.Lerp(liquidBottom, liquidTop, normalizedFill);
+        Vector3 surfacePoint = new Vector3(bottleControllerRef.transform.position.x, surfaceY, 0f);
+        lineRenderer.SetPosition(1, surfacePoint);
+
         bottleMaskSR.material.SetFloat("_FillAmout", FillAmountCurve.Evaluate(angleValue));
         bottleControllerRef.FillUp(FillAmountCurve.Evaluate(lastAngleValue) - FillAmountCurve.Evaluate(angleValue));
       }
@@ -150,6 +168,8 @@ public class BottleController : MonoBehaviour
     // Cập nhật số lớp màu sau khi đổ
     numberOfColorsInBottle -= numberOfColorsToTransfer;
     bottleControllerRef.numberOfColorsInBottle += numberOfColorsToTransfer;
+
+    lineRenderer.enabled = false;
 
     // Clear slot màu đã trống để shader không hiển thị màu cũ
     for (int i = numberOfColorsInBottle; i < maxLayers; i++)
