@@ -82,6 +82,9 @@ public class BottleController : MonoBehaviour
   {
     if (cork == null) yield break;
 
+    // Âm thanh chai đầy
+    SoundManager.Instance?.PlayBottleFull();
+
     Vector3 restPos  = cork.transform.localPosition;
     Vector3 startPos = restPos + Vector3.up * corkDropHeight;
 
@@ -97,6 +100,9 @@ public class BottleController : MonoBehaviour
       yield return null;
     }
     cork.transform.localPosition = restPos;
+
+    // Âm thanh nút chạm vào miệng chai
+    SoundManager.Instance?.PlayBottleClose();
   }
 
   void Update()
@@ -153,6 +159,8 @@ public class BottleController : MonoBehaviour
     float lastAngleValue = 0f;
 
     isRotating = true;
+    // Bắt đầu tiếng đổ nước
+    SoundManager.Instance?.StartPouring();
 
     while (t < rotationDuration)
     {
@@ -212,6 +220,8 @@ public class BottleController : MonoBehaviour
       StartCoroutine(bottleControllerRef.PlayCorkAnimation());
 
     lineRenderer.enabled = false;
+    // Dừng tiếng đổ nước
+    SoundManager.Instance?.StopPouring();
 
     // Clear slot màu đã trống để shader không hiển thị màu cũ
     for (int i = numberOfColorsInBottle; i < maxLayers; i++)
@@ -274,6 +284,9 @@ public class BottleController : MonoBehaviour
 
     transform.GetComponent<SpriteRenderer>().sortingOrder -= 2;
     bottleMaskSR.sortingOrder -= 2;
+
+    // Âm thanh đặt chai xuống
+    SoundManager.Instance?.PlayBottleDown();
 
     onTransferComplete?.Invoke();
     onTransferComplete = null;
@@ -378,7 +391,11 @@ public class BottleController : MonoBehaviour
     isSelected = selected;
 
     if (isSelected)
+    {
       targetPosition = originalPosition + Vector3.up * selectionHeightOffset;
+      // Âm thanh cầm chai lên
+      SoundManager.Instance?.PlayBottleUp();
+    }
     else
       targetPosition = originalPosition;
   }
