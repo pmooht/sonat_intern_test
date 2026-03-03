@@ -55,9 +55,7 @@ public class BottleController : MonoBehaviour
 
   public LineRenderer lineRenderer;
 
-  // ── Cork (nút chai) ────────────────────────────────────────────
   [SerializeField] private GameObject cork;
-  // Độ cao xuất phát của cork so với vị trí nghỉ (theo trục Y local)
   [SerializeField] private float corkDropHeight   = 2f;
   [SerializeField] private float corkAnimDuration = 0.4f;
 
@@ -70,19 +68,15 @@ public class BottleController : MonoBehaviour
     originalPosition = transform.position;
     targetPosition = originalPosition;
 
-    // Ẩn nút chai lúc khởi đầu
     if (cork != null) cork.SetActive(false);
 
     UpdateColorsOnShader();
     UpdateTopColorValues();
   }
 
-  // Animation nút chai rơi xuống từ trên cao vào vị trí nghỉ
   public IEnumerator PlayCorkAnimation()
   {
     if (cork == null) yield break;
-
-    // Âm thanh chai đầy
     SoundManager.Instance?.PlayBottleFull();
 
     Vector3 restPos  = cork.transform.localPosition;
@@ -101,7 +95,6 @@ public class BottleController : MonoBehaviour
     }
     cork.transform.localPosition = restPos;
 
-    // Âm thanh nút chạm vào miệng chai
     SoundManager.Instance?.PlayBottleClose();
   }
 
@@ -159,7 +152,6 @@ public class BottleController : MonoBehaviour
     float lastAngleValue = 0f;
 
     isRotating = true;
-    // Bắt đầu tiếng đổ nước
     SoundManager.Instance?.StartPouring();
 
     while (t < rotationDuration)
@@ -215,12 +207,10 @@ public class BottleController : MonoBehaviour
     numberOfColorsInBottle -= numberOfColorsToTransfer;
     bottleControllerRef.numberOfColorsInBottle += numberOfColorsToTransfer;
 
-    // Kiểm tra chai đích: nếu đầy và đồng màu → hiện nút chai
     if (bottleControllerRef.numberOfColorsInBottle == maxLayers && bottleControllerRef.IsSolved())
       StartCoroutine(bottleControllerRef.PlayCorkAnimation());
 
     lineRenderer.enabled = false;
-    // Dừng tiếng đổ nước
     SoundManager.Instance?.StopPouring();
 
     // Clear slot màu đã trống để shader không hiển thị màu cũ
@@ -285,13 +275,10 @@ public class BottleController : MonoBehaviour
     transform.GetComponent<SpriteRenderer>().sortingOrder -= 2;
     bottleMaskSR.sortingOrder -= 2;
 
-    // Âm thanh đặt chai xuống
     SoundManager.Instance?.PlayBottleDown();
 
     onTransferComplete?.Invoke();
     onTransferComplete = null;
-
-    // Kiểm tra chai nguồn: nếu đầy và đồng màu → hiện nút chai
     if (numberOfColorsInBottle == maxLayers && IsSolved())
       StartCoroutine(PlayCorkAnimation());
   }
@@ -393,7 +380,6 @@ public class BottleController : MonoBehaviour
     if (isSelected)
     {
       targetPosition = originalPosition + Vector3.up * selectionHeightOffset;
-      // Âm thanh cầm chai lên
       SoundManager.Instance?.PlayBottleUp();
     }
     else

@@ -1,34 +1,75 @@
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
-// Orchestrator: khởi động game, kết nối các component, lắng nghe event
-// Đây là nơi để hook thêm UI, Sound, Analytics, v.v. về sau
 public class GameController : MonoBehaviour
 {
   [SerializeField] private LevelManager levelManager;
   [SerializeField] private InputHandler inputHandler;
 
+  [Header("Win UI")]
+  [SerializeField] private GameObject winPanel;
+  [SerializeField] private Button btnContinue;
+  [SerializeField] private Button btnRestartWin;
+
+  [Header("Lose UI")]
+  [SerializeField] private GameObject losePanel;
+  [SerializeField] private Button btnRestartLose;
+  [SerializeField] private Button btnExit;
+
+  [SerializeField] private string selectLevelSceneName = "SelectLevel";
+
   private void Start()
   {
-    // Subscribe event từ LevelManager
+    winPanel?.SetActive(false);
+    losePanel?.SetActive(false);
+
     levelManager.OnLevelComplete += HandleLevelComplete;
 
-    // Bắt đầu game với level đầu tiên
+    btnContinue?.onClick.AddListener(OnContinueClicked);
+    btnRestartWin?.onClick.AddListener(OnRestartClicked);
+    btnRestartLose?.onClick.AddListener(OnRestartClicked);
+    btnExit?.onClick.AddListener(OnExitClicked);
+
     levelManager.SpawnLevel();
   }
 
   private void OnDestroy()
   {
-    // Hủy subscribe để tránh memory leak
     if (levelManager != null)
       levelManager.OnLevelComplete -= HandleLevelComplete;
   }
 
-  // Được gọi khi LevelManager thông báo level hoàn thành
-  // → Thêm logic UI / Sound / Analytics tại đây
   private void HandleLevelComplete()
   {
-    Debug.Log("[GameController] Level hoàn thành!");
-    // TODO: ShowLevelCompleteUI();
-    // TODO: PlayCompleteSFX();
+    bool hasNext = levelManager.HasNextLevel;
+
+    winPanel?.SetActive(true);
+
+    if (btnContinue != null)
+      btnContinue.gameObject.SetActive(hasNext);
+  }
+
+  private void OnContinueClicked()
+  {
+    winPanel?.SetActive(false);
+    levelManager.LoadNextLevel();
+  }
+
+  private void OnRestartClicked()
+  {
+    winPanel?.SetActive(false);
+    losePanel?.SetActive(false);
+    levelManager.RestartLevel();
+  }
+
+  private void OnExitClicked()
+  {
+    SceneManager.LoadScene(selectLevelSceneName);
+  }
+
+  public void ShowLosePanel()
+  {
+    losePanel?.SetActive(true);
   }
 }

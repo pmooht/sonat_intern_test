@@ -1,74 +1,99 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
-// Chịu trách nhiệm: spawn chai, xáo trộn màu, quản lý tiến trình level
 public class LevelManager : MonoBehaviour
 {
   [SerializeField] private LevelListSO levelList;
   [SerializeField] private GameObject bottlePrefab;
   [SerializeField] private float bottleSpacing = 1.5f;
-  [SerializeField] private SpriteRenderer backgroundRenderer; // SpriteRenderer nền game
+  [SerializeField] private SpriteRenderer backgroundRenderer;
+  [SerializeField] private TMP_Text levelText;
 
   private int currentLevelIndex = 0;
-
-  // Event thông báo khi 1 level hoàn thành
-  // → GameController, UI, Sound Manager có thể subscribe
   public event Action OnLevelComplete;
 
   private void Awake()
   {
-    // Đọc level được chọn từ scene SelectLevel (mặc định 0)
     currentLevelIndex = PlayerPrefs.GetInt("SelectedLevel", 0);
   }
 
   public void SpawnLevel()
   {
     if (levelList == null || levelList.levels.Length == 0 || bottlePrefab == null)
-    {
-      Debug.LogError("[LevelManager] Thiếu levelList hoặc bottlePrefab!");
       return;
-    }
+
+    if (currentLevelIndex >= levelList.levels.Length)
+      return;
 
     LevelDataSO levelData = levelList.levels[currentLevelIndex];
 
-    // Áp dụng background của level
-    if (backgroundRenderer != null && levelData.background != null)
-      backgroundRenderer.sprite = levelData.background;
+    if (levelData.levelPrefab == null)
+      return;
 
-    BottleData[] bottles = levelData.bottles;
+    LevelConfig config = levelData.levelPrefab.GetComponent<LevelConfig>();
+    if (config == null)
+      return;
 
-    // ── Gom toàn bộ màu vào pool ──────────────────────────────────
+    if (levelText != null)
+      levelText.text = $"Level {currentLevelIndex + 1}";
+
+    if (backgroundRenderer != null && config.backgroundRenderer != null)
+      backgroundRenderer.sprite = config.backgroundRenderer.sprite;
+
+    if (config.palette == null || config.palette.Length == 0)
+      return;
+
+    const int layersPerBottle = 4;
+    int totalSlots = config.filledBottleCount * layersPerBottle;
+
+    if (totalSlots % config.palette.Length != 0)
+      return;
+
+    int slotsPerColor = totalSlots / config.palette.Length;
+
     List<Color> colorPool = new List<Color>();
-    foreach (BottleData b in bottles)
-      for (int i = 0; i < b.numberOfColors; i++)
-        colorPool.Add(b.colors[i]);
+    foreach (Color c in config.palette)
+      for (int i = 0; i < slotsPerColor; i++)
+        colorPool.Add(c);
 
-    // ── Fisher-Yates shuffle ───────────────────────────────────────
     for (int i = colorPool.Count - 1; i > 0; i--)
     {
-      int j = UnityEngine.Random.Range(0, i + 1);
-      Color tmp = colorPool[i];
+      int j        = UnityEngine.Random.Range(0, i + 1);
+      Color tmp    = colorPool[i];
       colorPool[i] = colorPool[j];
       colorPool[j] = tmp;
     }
 
-    // ── Phân phối lại màu vào từng chai ───────────────────────────
     int colorIdx = 0;
-    BottleData[] shuffledBottles = new BottleData[bottles.Length];
-    for (int i = 0; i < bottles.Length; i++)
+    List<BottleData> filledBottles = new List<BottleData>();
+
+    for (int i = 0; i < config.filledBottleCount; i++)
     {
-      shuffledBottles[i] = new BottleData
+      BottleData bd = new BottleData
       {
-        numberOfColors = bottles[i].numberOfColors,
-        colors         = new Color[4]
+        numberOfColors = layersPerBottle,
+        colors         = new Color[layersPerBottle]
       };
-      for (int c = 0; c < bottles[i].numberOfColors; c++)
-        shuffledBottles[i].colors[c] = colorPool[colorIdx++];
+      for (int c = 0; c < layersPerBottle; c++)
+        bd.colors[c] = colorPool[colorIdx++];
+      filledBottles.Add(bd);
     }
 
-    // ── Spawn chai ─────────────────────────────────────────────────
-    int count = shuffledBottles.Length;
+    for (int i = filledBottles.Count - 1; i > 0; i--)
+    {
+      int j = UnityEngine.Random.Range(0, i + 1);
+      BottleData tmp = filledBottles[i];
+      filledBottles[i] = filledBottles[j];
+      filledBottles[j] = tmp;
+    }
+    
+    List<BottleData> allBottles = new List<BottleData>(filledBottles);
+    for (int i = 0; i < config.emptyBottleCount; i++)
+      allBottles.Add(new BottleData { numberOfColors = 0, colors = new Color[layersPerBottle] });
+
+    int count = allBottles.Count;
     float totalWidth = (count - 1) * bottleSpacing;
     float startX = -totalWidth / 2f;
 
@@ -78,17 +103,12 @@ public class LevelManager : MonoBehaviour
       GameObject go = Instantiate(bottlePrefab, spawnPos, Quaternion.identity);
       BottleController bottle = go.GetComponent<BottleController>();
 
-      if (bottle == null)
-      {
-        Debug.LogError("[LevelManager] bottlePrefab không có BottleController!");
-        continue;
-      }
+      if (bottle == null) continue;
 
-      bottle.InitFromData(shuffledBottles[i]);
+      bottle.InitFromData(allBottles[i]);
     }
   }
 
-  // Được gọi bởi InputHandler mỗi khi 1 lần đổ màu hoàn tất
   public void CheckLevelComplete()
   {
     BottleController[] allBottles = FindObjectsByType<BottleController>(FindObjectsSortMode.None);
@@ -97,23 +117,22 @@ public class LevelManager : MonoBehaviour
       if (!bottle.IsSolved()) return;
     }
 
-    // Tất cả đã solved → dọn dẹp chai cũ
     foreach (BottleController bottle in allBottles)
       Destroy(bottle.gameObject);
 
-    // Thông báo ra ngoài (UI, Sound, v.v.)
     OnLevelComplete?.Invoke();
+  }
 
-    // Tiến sang level tiếp theo
+  public bool HasNextLevel => currentLevelIndex + 1 < levelList.levels.Length;
+
+  public void LoadNextLevel()
+  {
     currentLevelIndex++;
-    if (currentLevelIndex < levelList.levels.Length)
-    {
-      Debug.Log($"[LevelManager] Bắt đầu Level {currentLevelIndex + 1}");
-      SpawnLevel();
-    }
-    else
-    {
-      Debug.Log("[LevelManager] Chúc mừng! Bạn đã hoàn thành tất cả các level!");
-    }
+    SpawnLevel();
+  }
+
+  public void RestartLevel()
+  {
+    SpawnLevel();
   }
 }

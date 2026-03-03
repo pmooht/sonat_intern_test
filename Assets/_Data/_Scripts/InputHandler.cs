@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// Chức năng: đọc input chuột, chọn chai, yêu cầu chuyển màu
 public class InputHandler : MonoBehaviour
 {
   [SerializeField] private LevelManager levelManager;
