@@ -74,7 +74,14 @@ public class BottleController : MonoBehaviour
       {
         transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * selectionMoveSpeed);
       }
-    }
+  }
+
+  public void InitFromData(BottleData data)
+  {
+    numberOfColorsInBottle = data.numberOfColors;
+    for (int i = 0; i < bottleColors.Length; i++)
+      bottleColors[i] = i < data.colors.Length ? data.colors[i] : Color.clear;
+  }
 
   // Đẩy toàn bộ mảng bottleColors lên shader
   private void UpdateColorsOnShader()

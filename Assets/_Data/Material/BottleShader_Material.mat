@@ -45,7 +45,7 @@ Material:
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: 0
     - _FillAmount: 0.21
-    - _FillAmout: -0.87
+    - _FillAmout: 2
     - _SARM: 1
     - _ScaleAndRotationMultiplier: 1
     m_Colors:
