@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Chịu trách nhiệm: đọc input chuột, chọn chai, yêu cầu chuyển màu
+// Chức năng: đọc input chuột, chọn chai, yêu cầu chuyển màu
 public class InputHandler : MonoBehaviour
 {
   [SerializeField] private LevelManager levelManager;
@@ -14,7 +14,6 @@ public class InputHandler : MonoBehaviour
       HandleInput();
   }
 
-  // Raycast tìm chai được click → chọn chai đầu hoặc thực hiện chuyển màu
   private void HandleInput()
   {
     Vector3 mousePos   = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -30,7 +29,6 @@ public class InputHandler : MonoBehaviour
 
     if (firstBottle == null)
     {
-      // Không cho phép chọn chai rỗng làm chai nguồn
       if (clickedBottle.numberOfColorsInBottle == 0) return;
 
       firstBottle = clickedBottle;
@@ -40,20 +38,17 @@ public class InputHandler : MonoBehaviour
     {
       if (firstBottle == clickedBottle)
       {
-        // Click lại chai đang chọn: bỏ chọn
         firstBottle.SetSelected(false);
         firstBottle = null;
       }
       else
       {
-        // Click chai khác: thử thực hiện chuyển màu
         secondBottle = clickedBottle;
         AttemptTransfer();
       }
     }
   }
 
-  // Kiểm tra hợp lệ và bắt đầu animation đổ màu
   private void AttemptTransfer()
   {
     firstBottle.bottleControllerRef = secondBottle;
@@ -63,7 +58,6 @@ public class InputHandler : MonoBehaviour
 
     if (secondBottle.FillBottleCheck(firstBottle.topColor))
     {
-      // Chuyển hợp lệ: subscribe CheckLevelComplete qua LevelManager
       firstBottle.SetSelected(false);
       firstBottle.onTransferComplete += levelManager.CheckLevelComplete;
       firstBottle.StartColorTransfer();
@@ -72,7 +66,6 @@ public class InputHandler : MonoBehaviour
     }
     else
     {
-      // Chuyển không hợp lệ: reset lựa chọn
       firstBottle.SetSelected(false);
       firstBottle  = null;
       secondBottle = null;

@@ -6,14 +6,21 @@ using UnityEngine;
 public class LevelManager : MonoBehaviour
 {
   [SerializeField] private LevelListSO levelList;
-  [SerializeField] private GameObject  bottlePrefab;
-  [SerializeField] private float       bottleSpacing = 1.5f;
+  [SerializeField] private GameObject bottlePrefab;
+  [SerializeField] private float bottleSpacing = 1.5f;
+  [SerializeField] private SpriteRenderer backgroundRenderer; // SpriteRenderer nền game
 
   private int currentLevelIndex = 0;
 
   // Event thông báo khi 1 level hoàn thành
   // → GameController, UI, Sound Manager có thể subscribe
   public event Action OnLevelComplete;
+
+  private void Awake()
+  {
+    // Đọc level được chọn từ scene SelectLevel (mặc định 0)
+    currentLevelIndex = PlayerPrefs.GetInt("SelectedLevel", 0);
+  }
 
   public void SpawnLevel()
   {
@@ -23,7 +30,13 @@ public class LevelManager : MonoBehaviour
       return;
     }
 
-    BottleData[] bottles = levelList.levels[currentLevelIndex].bottles;
+    LevelDataSO levelData = levelList.levels[currentLevelIndex];
+
+    // Áp dụng background của level
+    if (backgroundRenderer != null && levelData.background != null)
+      backgroundRenderer.sprite = levelData.background;
+
+    BottleData[] bottles = levelData.bottles;
 
     // ── Gom toàn bộ màu vào pool ──────────────────────────────────
     List<Color> colorPool = new List<Color>();
@@ -34,14 +47,14 @@ public class LevelManager : MonoBehaviour
     // ── Fisher-Yates shuffle ───────────────────────────────────────
     for (int i = colorPool.Count - 1; i > 0; i--)
     {
-      int   j   = UnityEngine.Random.Range(0, i + 1);
+      int j = UnityEngine.Random.Range(0, i + 1);
       Color tmp = colorPool[i];
       colorPool[i] = colorPool[j];
       colorPool[j] = tmp;
     }
 
     // ── Phân phối lại màu vào từng chai ───────────────────────────
-    int          colorIdx       = 0;
+    int colorIdx = 0;
     BottleData[] shuffledBottles = new BottleData[bottles.Length];
     for (int i = 0; i < bottles.Length; i++)
     {
@@ -55,15 +68,15 @@ public class LevelManager : MonoBehaviour
     }
 
     // ── Spawn chai ─────────────────────────────────────────────────
-    int   count      = shuffledBottles.Length;
+    int count = shuffledBottles.Length;
     float totalWidth = (count - 1) * bottleSpacing;
-    float startX     = -totalWidth / 2f;
+    float startX = -totalWidth / 2f;
 
     for (int i = 0; i < count; i++)
     {
-      Vector3          spawnPos = new Vector3(startX + i * bottleSpacing, 0f, 0f);
-      GameObject       go      = Instantiate(bottlePrefab, spawnPos, Quaternion.identity);
-      BottleController bottle  = go.GetComponent<BottleController>();
+      Vector3 spawnPos = new Vector3(startX + i * bottleSpacing, 0f, 0f);
+      GameObject go = Instantiate(bottlePrefab, spawnPos, Quaternion.identity);
+      BottleController bottle = go.GetComponent<BottleController>();
 
       if (bottle == null)
       {

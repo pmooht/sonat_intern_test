@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95848dca22254084aa573e4c4dd4978e, type: 3}
+  m_Name: Level 3
+  m_EditorClassIdentifier: 
+  levelIndex: 0
+  background: {fileID: -7443756053782179069, guid: 0f654ad817de5c641b4c68bf5401a836, type: 3}
+  bottles:
+  - colors:
+    - {r: 0.86274517, g: 1, b: 0, a: 0}
+    - {r: 0.8000001, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0.098039225, b: 1, a: 0}
+    - {r: 0.011764707, g: 0.427451, b: 0.003921569, a: 0}
+    numberOfColors: 4
+  - colors:
+    - {r: 0.86274517, g: 1, b: 0, a: 0}
+    - {r: 0.8000001, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0.098039225, b: 1, a: 0}
+    - {r: 0.011764707, g: 0.427451, b: 0.003921569, a: 0}
+    numberOfColors: 2
+  - colors:
+    - {r: 0.86274517, g: 1, b: 0, a: 0}
+    - {r: 0.8000001, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0.098039225, b: 1, a: 0}
+    - {r: 0.011764707, g: 0.427451, b: 0.003921569, a: 0}
+    numberOfColors: 3
+  - colors:
+    - {r: 0.86274517, g: 1, b: 0, a: 0}
+    - {r: 0.8000001, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0.098039225, b: 1, a: 0}
+    - {r: 0.011764707, g: 0.427451, b: 0.003921569, a: 0}
+    numberOfColors: 4
+  - colors:
+    - {r: 0.86274517, g: 1, b: 0, a: 0}
+    - {r: 0.8000001, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0.098039225, b: 1, a: 0}
+    - {r: 0.011764707, g: 0.427451, b: 0.003921569, a: 0}
+    numberOfColors: 4
+  - colors:
+    - {r: 0.86274517, g: 1, b: 0, a: 0}
+    - {r: 0.8000001, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0.098039225, b: 1, a: 0}
+    - {r: 0.011764707, g: 0.427451, b: 0.003921569, a: 0}
+    numberOfColors: 2
+  - colors:
+    - {r: 0.86274517, g: 1, b: 0, a: 0}
+    - {r: 0.8000001, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0.098039225, b: 1, a: 0}
+    - {r: 0.011764707, g: 0.427451, b: 0.003921569, a: 0}
+    numberOfColors: 1
+  - colors:
+    - {r: 0.86274517, g: 1, b: 0, a: 0}
+    - {r: 0.8000001, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0.098039225, b: 1, a: 0}
+    - {r: 0.011764707, g: 0.427451, b: 0.003921569, a: 0}
+    numberOfColors: 2
+  - colors:
+    - {r: 0.86274517, g: 1, b: 0, a: 0}
+    - {r: 0.8000001, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0.098039225, b: 1, a: 0}
+    - {r: 0.011764707, g: 0.427451, b: 0.003921569, a: 0}
+    numberOfColors: 2
+  - colors:
+    - {r: 0.86274517, g: 1, b: 0, a: 0}
+    - {r: 0.8000001, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0.098039225, b: 1, a: 0}
+    - {r: 0.011764707, g: 0.427451, b: 0.003921569, a: 0}
+    numberOfColors: 0

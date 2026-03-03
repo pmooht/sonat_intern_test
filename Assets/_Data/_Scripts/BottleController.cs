@@ -55,6 +55,12 @@ public class BottleController : MonoBehaviour
 
   public LineRenderer lineRenderer;
 
+  // ── Cork (nút chai) ────────────────────────────────────────────
+  [SerializeField] private GameObject cork;
+  // Độ cao xuất phát của cork so với vị trí nghỉ (theo trục Y local)
+  [SerializeField] private float corkDropHeight   = 2f;
+  [SerializeField] private float corkAnimDuration = 0.4f;
+
   // Khởi tạo: set fill shader, lưu vị trí gốc, cập nhật màu và topColor
   void Start()
   {
@@ -64,8 +70,33 @@ public class BottleController : MonoBehaviour
     originalPosition = transform.position;
     targetPosition = originalPosition;
 
+    // Ẩn nút chai lúc khởi đầu
+    if (cork != null) cork.SetActive(false);
+
     UpdateColorsOnShader();
     UpdateTopColorValues();
+  }
+
+  // Animation nút chai rơi xuống từ trên cao vào vị trí nghỉ
+  public IEnumerator PlayCorkAnimation()
+  {
+    if (cork == null) yield break;
+
+    Vector3 restPos  = cork.transform.localPosition;
+    Vector3 startPos = restPos + Vector3.up * corkDropHeight;
+
+    cork.transform.localPosition = startPos;
+    cork.SetActive(true);
+
+    float t = 0f;
+    while (t < corkAnimDuration)
+    {
+      t += Time.deltaTime;
+      float lerp = Mathf.SmoothStep(0f, 1f, t / corkAnimDuration);
+      cork.transform.localPosition = Vector3.Lerp(startPos, restPos, lerp);
+      yield return null;
+    }
+    cork.transform.localPosition = restPos;
   }
 
   void Update()
@@ -176,6 +207,10 @@ public class BottleController : MonoBehaviour
     numberOfColorsInBottle -= numberOfColorsToTransfer;
     bottleControllerRef.numberOfColorsInBottle += numberOfColorsToTransfer;
 
+    // Kiểm tra chai đích: nếu đầy và đồng màu → hiện nút chai
+    if (bottleControllerRef.numberOfColorsInBottle == maxLayers && bottleControllerRef.IsSolved())
+      StartCoroutine(bottleControllerRef.PlayCorkAnimation());
+
     lineRenderer.enabled = false;
 
     // Clear slot màu đã trống để shader không hiển thị màu cũ
@@ -242,6 +277,10 @@ public class BottleController : MonoBehaviour
 
     onTransferComplete?.Invoke();
     onTransferComplete = null;
+
+    // Kiểm tra chai nguồn: nếu đầy và đồng màu → hiện nút chai
+    if (numberOfColorsInBottle == maxLayers && IsSolved())
+      StartCoroutine(PlayCorkAnimation());
   }
 
   // Điểm khởi đầu của toàn bộ quá trình đổ màu:
