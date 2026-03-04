@@ -35,6 +35,9 @@ public class BottleController : MonoBehaviour
 
   private bool isRotating = false;
 
+  /// <summary>True khi đang có animation đổ màu đang chạy.</summary>
+  public bool IsAnimating => isRotating;
+
   public BottleController bottleControllerRef;
   private int numberOfColorsToTransfer = 0;
 
@@ -369,6 +372,51 @@ public class BottleController : MonoBehaviour
         return false;
     }
     return true;
+  }
+
+  public PowerUpManager.BottleSnapshot GetSnapshot()
+  {
+    Color[] copy = new Color[bottleColors.Length];
+    bottleColors.CopyTo(copy, 0);
+    return new PowerUpManager.BottleSnapshot
+    {
+      colors        = copy,
+      numberOfColors = numberOfColorsInBottle
+    };
+  }
+
+  public void RestoreFromSnapshot(PowerUpManager.BottleSnapshot snap)
+  {
+    numberOfColorsInBottle = snap.numberOfColors;
+    for (int i = 0; i < bottleColors.Length; i++)
+      bottleColors[i] = i < snap.colors.Length ? snap.colors[i] : Color.clear;
+
+    UpdateColorsOnShader();
+    UpdateTopColorValues();
+    bottleMaskSR.material.SetFloat("_FillAmout", fillAmounts[numberOfColorsInBottle]);
+  }
+
+  public void ShuffleColors()
+  {
+    if (numberOfColorsInBottle <= 1) return;
+
+    for (int i = numberOfColorsInBottle - 1; i > 0; i--)
+    {
+      int j = UnityEngine.Random.Range(0, i + 1);
+      Color tmp       = bottleColors[i];
+      bottleColors[i] = bottleColors[j];
+      bottleColors[j] = tmp;
+    }
+
+    UpdateColorsOnShader();
+    UpdateTopColorValues();
+  }
+
+  public void SetOriginalPosition(Vector3 newPosition)
+  {
+    originalPosition = newPosition;
+    if (!isSelected)
+      targetPosition = originalPosition;
   }
 
   public void SetSelected(bool selected)

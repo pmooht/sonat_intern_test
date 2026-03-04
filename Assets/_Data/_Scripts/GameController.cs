@@ -6,6 +6,7 @@ public class GameController : MonoBehaviour
 {
   [SerializeField] private LevelManager levelManager;
   [SerializeField] private InputHandler inputHandler;
+  [SerializeField] private PowerUpManager powerUpManager;
 
   [Header("Win UI")]
   [SerializeField] private GameObject winPanel;
@@ -53,6 +54,7 @@ public class GameController : MonoBehaviour
   private void OnContinueClicked()
   {
     winPanel?.SetActive(false);
+    powerUpManager?.ResetAllUses();
     levelManager.LoadNextLevel();
   }
 
@@ -60,6 +62,7 @@ public class GameController : MonoBehaviour
   {
     winPanel?.SetActive(false);
     losePanel?.SetActive(false);
+    powerUpManager?.ResetAllUses();
     levelManager.RestartLevel();
   }
 

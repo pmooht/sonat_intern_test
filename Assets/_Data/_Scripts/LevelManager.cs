@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -14,6 +15,8 @@ public class LevelManager : MonoBehaviour
   private int currentLevelIndex = 0;
   public event Action OnLevelComplete;
 
+  private List<BottleController> spawnedBottles = new List<BottleController>();
+
   private void Awake()
   {
     currentLevelIndex = PlayerPrefs.GetInt("SelectedLevel", 0);
@@ -21,6 +24,11 @@ public class LevelManager : MonoBehaviour
 
   public void SpawnLevel()
   {
+    // Destroy các bình cũ trước khi spawn level mới
+    foreach (BottleController b in spawnedBottles)
+      if (b != null) Destroy(b.gameObject);
+    spawnedBottles.Clear();
+
     if (levelList == null || levelList.levels.Length == 0 || bottlePrefab == null)
       return;
 
@@ -106,22 +114,84 @@ public class LevelManager : MonoBehaviour
       if (bottle == null) continue;
 
       bottle.InitFromData(allBottles[i]);
+      spawnedBottles.Add(bottle);
     }
   }
 
   public void CheckLevelComplete()
   {
-    BottleController[] allBottles = FindObjectsByType<BottleController>(FindObjectsSortMode.None);
-    foreach (BottleController bottle in allBottles)
+    foreach (BottleController bottle in spawnedBottles)
     {
-      if (!bottle.IsSolved()) return;
+      if (bottle != null && !bottle.IsSolved()) return;
     }
 
-    foreach (BottleController bottle in allBottles)
-      Destroy(bottle.gameObject);
+    foreach (BottleController bottle in spawnedBottles)
+      if (bottle != null) Destroy(bottle.gameObject);
+    spawnedBottles.Clear();
 
     OnLevelComplete?.Invoke();
   }
+
+  public void AddExtraBottle()
+  {
+    BottleData emptyData = new BottleData
+    {
+      numberOfColors = 0,
+      colors         = new Color[4]
+    };
+
+    GameObject go = Instantiate(bottlePrefab, Vector3.zero, Quaternion.identity);
+    BottleController bottle = go.GetComponent<BottleController>();
+    if (bottle == null) { Destroy(go); return; }
+
+    bottle.InitFromData(emptyData);
+    spawnedBottles.Add(bottle);
+
+    StartCoroutine(RepositionAllBottles());
+  }
+
+  /// <summary>
+  /// Tính lại vị trí nằm ngang cho tất cả bình dựa trên số lượng hiện tại,
+  /// rồi tween mượt về vị trí mới.
+  /// </summary>
+  private IEnumerator RepositionAllBottles()
+  {
+    int   count      = spawnedBottles.Count;
+    float totalWidth = (count - 1) * bottleSpacing;
+    float startX     = -totalWidth / 2f;
+
+    Vector3[] fromPositions = new Vector3[count];
+    Vector3[] toPositions   = new Vector3[count];
+    for (int i = 0; i < count; i++)
+    {
+      if (spawnedBottles[i] == null) continue;
+      fromPositions[i] = spawnedBottles[i].transform.position;
+      toPositions[i]   = new Vector3(startX + i * bottleSpacing, 0f, 0f);
+    }
+
+    float t = 0f;
+    const float duration = 0.4f;
+    while (t < duration)
+    {
+      t += Time.deltaTime;
+      float lerp = Mathf.SmoothStep(0f, 1f, t / duration);
+      for (int i = 0; i < count; i++)
+      {
+        if (spawnedBottles[i] == null) continue;
+        spawnedBottles[i].transform.position = Vector3.Lerp(fromPositions[i], toPositions[i], lerp);
+      }
+      yield return null;
+    }
+
+    for (int i = 0; i < count; i++)
+    {
+      if (spawnedBottles[i] == null) continue;
+      spawnedBottles[i].transform.position = toPositions[i];
+      spawnedBottles[i].SetOriginalPosition(toPositions[i]);
+    }
+  }
+
+  public IReadOnlyList<BottleController> GetAllBottles() => spawnedBottles;
 
   public bool HasNextLevel => currentLevelIndex + 1 < levelList.levels.Length;
 

@@ -3,9 +3,12 @@ using UnityEngine;
 public class InputHandler : MonoBehaviour
 {
   [SerializeField] private LevelManager levelManager;
+  [SerializeField] private PowerUpManager powerUpManager;
 
   private BottleController firstBottle;
   private BottleController secondBottle;
+
+  public BottleController SelectedBottle => firstBottle;
 
   private void Update()
   {
@@ -29,6 +32,7 @@ public class InputHandler : MonoBehaviour
     if (firstBottle == null)
     {
       if (clickedBottle.numberOfColorsInBottle == 0) return;
+      if (clickedBottle.IsSolved()) return;
 
       firstBottle = clickedBottle;
       firstBottle.SetSelected(true);
@@ -58,6 +62,7 @@ public class InputHandler : MonoBehaviour
     if (secondBottle.FillBottleCheck(firstBottle.topColor))
     {
       firstBottle.SetSelected(false);
+      powerUpManager?.RecordMove(firstBottle, secondBottle);
       firstBottle.onTransferComplete += levelManager.CheckLevelComplete;
       firstBottle.StartColorTransfer();
       firstBottle  = null;

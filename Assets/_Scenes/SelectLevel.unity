@@ -889,6 +889,7 @@ MonoBehaviour:
   levelList: {fileID: 11400000, guid: 1f3f3753b701ff140aaf9c4ad9b29c37, type: 2}
   levelButtonContainer: {fileID: 1181890946}
   gameplaySceneName: Gameplay
+  lockImageName: Lock
 --- !u!4 &577211608
 Transform:
   m_ObjectHideFlags: 0
