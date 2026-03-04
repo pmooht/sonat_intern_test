@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
 
   private void Start()
   {
+    SoundManager.Instance?.PlayMenuBGM();
     SetupLevelButtons();
   }
 

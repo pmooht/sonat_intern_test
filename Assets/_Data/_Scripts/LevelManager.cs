@@ -77,17 +77,33 @@ public class LevelManager : MonoBehaviour
     int colorIdx = 0;
     List<BottleData> filledBottles = new List<BottleData>();
 
-    for (int i = 0; i < config.filledBottleCount; i++)
+    do
     {
-      BottleData bd = new BottleData
+      for (int i = colorPool.Count - 1; i > 0; i--)
       {
-        numberOfColors = layersPerBottle,
-        colors         = new Color[layersPerBottle]
-      };
-      for (int c = 0; c < layersPerBottle; c++)
-        bd.colors[c] = colorPool[colorIdx++];
-      filledBottles.Add(bd);
+        int j        = UnityEngine.Random.Range(0, i + 1);
+        Color tmp    = colorPool[i];
+        colorPool[i] = colorPool[j];
+        colorPool[j] = tmp;
+      }
+
+      colorIdx = 0;
+      filledBottles.Clear();
+
+      for (int i = 0; i < config.filledBottleCount; i++)
+      {
+        BottleData bd = new BottleData
+        {
+          numberOfColors = layersPerBottle,
+          colors         = new Color[layersPerBottle]
+        };
+        for (int c = 0; c < layersPerBottle; c++)
+          bd.colors[c] = colorPool[colorIdx++];
+        filledBottles.Add(bd);
+      }
     }
+    while (HasPreSolvedBottle(filledBottles, layersPerBottle));
+
 
     for (int i = filledBottles.Count - 1; i > 0; i--)
     {
@@ -150,10 +166,6 @@ public class LevelManager : MonoBehaviour
     StartCoroutine(RepositionAllBottles());
   }
 
-  /// <summary>
-  /// Tính lại vị trí nằm ngang cho tất cả bình dựa trên số lượng hiện tại,
-  /// rồi tween mượt về vị trí mới.
-  /// </summary>
   private IEnumerator RepositionAllBottles()
   {
     int   count      = spawnedBottles.Count;
@@ -204,5 +216,21 @@ public class LevelManager : MonoBehaviour
   public void RestartLevel()
   {
     SpawnLevel();
+  }
+
+  private bool HasPreSolvedBottle(List<BottleData> bottles, int layersPerBottle)
+  {
+    foreach (BottleData bd in bottles)
+    {
+      if (bd.numberOfColors < layersPerBottle) continue;
+
+      bool allSame = true;
+      for (int i = 1; i < bd.numberOfColors; i++)
+      {
+        if (bd.colors[i] != bd.colors[0]) { allSame = false; break; }
+      }
+      if (allSame) return true;
+    }
+    return false;
   }
 }

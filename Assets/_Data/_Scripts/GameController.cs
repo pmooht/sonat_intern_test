@@ -11,25 +11,33 @@ public class GameController : MonoBehaviour
   [Header("Win UI")]
   [SerializeField] private GameObject winPanel;
   [SerializeField] private Button btnContinue;
-  [SerializeField] private Button btnRestartWin;
+  [SerializeField] private Button btnExitWin;
 
   [Header("Lose UI")]
   [SerializeField] private GameObject losePanel;
   [SerializeField] private Button btnRestartLose;
+  [SerializeField] private Button btnExitLose;
+
+  [Header("Gameplay UI")]
+  [SerializeField] private Button btnRestart;
   [SerializeField] private Button btnExit;
 
   [SerializeField] private string selectLevelSceneName = "SelectLevel";
 
   private void Start()
   {
+    SoundManager.Instance?.PlayGameplayBGM();
+
     winPanel?.SetActive(false);
     losePanel?.SetActive(false);
 
     levelManager.OnLevelComplete += HandleLevelComplete;
 
     btnContinue?.onClick.AddListener(OnContinueClicked);
-    btnRestartWin?.onClick.AddListener(OnRestartClicked);
     btnRestartLose?.onClick.AddListener(OnRestartClicked);
+    btnExitWin?.onClick.AddListener(OnExitClicked);
+    btnExitLose?.onClick.AddListener(OnExitClicked);
+    btnRestart?.onClick.AddListener(OnRestartClicked);
     btnExit?.onClick.AddListener(OnExitClicked);
 
     levelManager.SpawnLevel();

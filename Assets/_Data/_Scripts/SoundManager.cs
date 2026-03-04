@@ -11,12 +11,18 @@ public class SoundManager : MonoBehaviour
   [SerializeField] private AudioClip bottleClose;
   [SerializeField] private AudioClip pouringWater;
 
+  [Header("Background Music")]
+  [SerializeField] private AudioClip menuBGM;
+  [SerializeField] private AudioClip gameplayBGM;
+
   [Header("Settings")]
-  [Range(0f, 1f)] [SerializeField] private float sfxVolume    = 1f;
-  [Range(0f, 1f)] [SerializeField] private float pouringVolume = 0.7f;
+  [Range(0f, 1f)] [SerializeField] private float sfxVolume     = 1f;
+  [Range(0f, 1f)] [SerializeField] private float pouringVolume  = 0.7f;
+  [Range(0f, 1f)] [SerializeField] private float bgmVolume      = 0.5f;
 
   private AudioSource sfxSource;
   private AudioSource loopSource;
+  private AudioSource bgmSource;
 
   private void Awake()
   {
@@ -30,10 +36,15 @@ public class SoundManager : MonoBehaviour
 
     sfxSource  = gameObject.AddComponent<AudioSource>();
     loopSource = gameObject.AddComponent<AudioSource>();
+    bgmSource  = gameObject.AddComponent<AudioSource>();
 
-    sfxSource.playOnAwake = false;
+    sfxSource.playOnAwake  = false;
     loopSource.playOnAwake = false;
-    loopSource.loop = true;
+    loopSource.loop        = true;
+
+    bgmSource.playOnAwake = false;
+    bgmSource.loop        = true;
+    bgmSource.volume      = bgmVolume;
   }
 
   public void PlayBottleUp()    => PlaySFX(bottleUp);
@@ -55,9 +66,29 @@ public class SoundManager : MonoBehaviour
       loopSource.Stop();
   }
 
+  public void PlayBGM(AudioClip clip)
+  {
+    if (clip == null) return;
+    if (bgmSource.clip == clip && bgmSource.isPlaying) return;
+
+    bgmSource.clip   = clip;
+    bgmSource.volume = bgmVolume;
+    bgmSource.Play();
+  }
+
+  public void StopBGM()
+  {
+    bgmSource.Stop();
+    bgmSource.clip = null;
+  }
+
+  public void PlayMenuBGM()    => PlayBGM(menuBGM);
+  public void PlayGameplayBGM() => PlayBGM(gameplayBGM);
+
   private void PlaySFX(AudioClip clip)
   {
     if (clip == null) return;
     sfxSource.PlayOneShot(clip, sfxVolume);
   }
 }
+

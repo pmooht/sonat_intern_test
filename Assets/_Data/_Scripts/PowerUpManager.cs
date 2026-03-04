@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PowerUpManager : MonoBehaviour
@@ -11,6 +12,11 @@ public class PowerUpManager : MonoBehaviour
   [SerializeField] private int maxUndoUses      = 3;
   [SerializeField] private int maxAddBottleUses = 3;
   [SerializeField] private int maxShuffleUses   = 3;
+
+  [Header("Use Count Texts")]
+  [SerializeField] private TMP_Text undoUsesText;
+  [SerializeField] private TMP_Text addBottleUsesText;
+  [SerializeField] private TMP_Text shuffleUsesText;
 
   private int undoUses;
   private int addBottleUses;
@@ -65,6 +71,7 @@ public class PowerUpManager : MonoBehaviour
 
     undoUses--;
     OnUndoUsesChanged?.Invoke(undoUses);
+    UpdateUsesTexts();
   }
 
   public void AddBottle()
@@ -75,6 +82,7 @@ public class PowerUpManager : MonoBehaviour
 
     addBottleUses--;
     OnAddBottleUsesChanged?.Invoke(addBottleUses);
+    UpdateUsesTexts();
   }
 
   public void ShuffleSelectedBottle()
@@ -89,6 +97,7 @@ public class PowerUpManager : MonoBehaviour
 
     shuffleUses--;
     OnShuffleUsesChanged?.Invoke(shuffleUses);
+    UpdateUsesTexts();
   }
 
   public void ResetAllUses()
@@ -102,6 +111,14 @@ public class PowerUpManager : MonoBehaviour
     OnUndoUsesChanged?.Invoke(undoUses);
     OnAddBottleUsesChanged?.Invoke(addBottleUses);
     OnShuffleUsesChanged?.Invoke(shuffleUses);
+    UpdateUsesTexts();
+  }
+
+  private void UpdateUsesTexts()
+  {
+    if (undoUsesText      != null) undoUsesText.text      = undoUses.ToString();
+    if (addBottleUsesText != null) addBottleUsesText.text = addBottleUses.ToString();
+    if (shuffleUsesText   != null) shuffleUsesText.text   = shuffleUses.ToString();
   }
 
   public int UndoUses      => undoUses;

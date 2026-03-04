@@ -456,7 +456,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.9960785, g: 0.6745098, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2819,6 +2819,60 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1522250512}
   m_CullTransparentMesh: 1
+--- !u!1 &1555040677
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1555040679}
+  - component: {fileID: 1555040678}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1555040678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1555040677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78180004b89a8d0408ed1696de2e6418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bottleUp: {fileID: 8300000, guid: 0b225e7c64482c945a4f062096481ad1, type: 3}
+  bottleDown: {fileID: 8300000, guid: fb13d2affba36f849adabbe21b93e812, type: 3}
+  bottleFull: {fileID: 8300000, guid: 42681da9c7be47341a5aad5cdb527897, type: 3}
+  bottleClose: {fileID: 8300000, guid: d87f5611ede5a4a408e29f5098dc1c0a, type: 3}
+  pouringWater: {fileID: 8300000, guid: c128b021815a26541850a8630d9ef883, type: 3}
+  menuBGM: {fileID: 8300000, guid: 261af3365fb0e4247abcb849db00cfe6, type: 3}
+  gameplayBGM: {fileID: 8300000, guid: 261af3365fb0e4247abcb849db00cfe6, type: 3}
+  sfxVolume: 1
+  pouringVolume: 1
+  bgmVolume: 0.2
+--- !u!4 &1555040679
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1555040677}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 669.9385, y: 401.4878, z: -5.956933}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1588389361
 GameObject:
   m_ObjectHideFlags: 0
@@ -3524,3 +3578,4 @@ SceneRoots:
   - {fileID: 285091879}
   - {fileID: 1099469486}
   - {fileID: 577211608}
+  - {fileID: 1555040679}
