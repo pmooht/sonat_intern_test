@@ -18,6 +18,9 @@ public class InputHandler : MonoBehaviour
 
   private void HandleInput()
   {
+    foreach (BottleController b in levelManager.GetAllBottles())
+      if (b != null && b.IsAnimating) return;
+
     Vector3 mousePos   = Camera.main.ScreenToWorldPoint(Input.mousePosition);
     Vector2 mousePos2D = new Vector2(mousePos.x, mousePos.y);
 
