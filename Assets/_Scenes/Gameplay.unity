@@ -720,7 +720,7 @@ Transform:
   m_GameObject: {fileID: 265119863}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3, z: -10}
+  m_LocalPosition: {x: 0, y: 2, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2664,9 +2664,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelManager: {fileID: 426409814}
   inputHandler: {fileID: 1459666693}
-  maxUndoUses: 3
-  maxAddBottleUses: 3
-  maxShuffleUses: 3
+  maxUndoUses: 5
+  maxAddBottleUses: 2
+  maxShuffleUses: 5
   undoUsesText: {fileID: 131460150}
   addBottleUsesText: {fileID: 26121275}
   shuffleUsesText: {fileID: 1001536953}

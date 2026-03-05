@@ -575,7 +575,7 @@ MonoBehaviour:
   - {r: 0, g: 0.09803922, b: 1, a: 0}
   - {r: 0.011764706, g: 0.42745098, b: 0.003921569, a: 0}
   bottleMaskSR: {fileID: 2058787285817087495}
-  rotationDuration: 2
+  rotationDuration: 1.5
   SARMCurve:
     serializedVersion: 2
     m_Curve:
@@ -613,22 +613,22 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 21.624548
-      value: 1.1556604
-      inSlope: -0.035759706
-      outSlope: -0.035759706
+      time: 17.238268
+      value: 1.4811321
+      inSlope: -0.04278552
+      outSlope: -0.04278552
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.17148027
+      inWeight: 0.4157069
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 36
       value: 0.5
-      inSlope: -0.039594054
-      outSlope: -0.039594054
+      inSlope: -0.05685455
+      outSlope: -0.05685455
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.44751415
+      inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 60

@@ -8,10 +8,10 @@ public class PowerUpManager : MonoBehaviour
   [SerializeField] private LevelManager levelManager;
   [SerializeField] private InputHandler inputHandler;
 
-  [Header("Uses (default = 3)")]
-  [SerializeField] private int maxUndoUses      = 3;
+  [Header("Uses")]
+  [SerializeField] private int maxUndoUses = 3;
   [SerializeField] private int maxAddBottleUses = 3;
-  [SerializeField] private int maxShuffleUses   = 3;
+  [SerializeField] private int maxShuffleUses = 3;
 
   [Header("Use Count Texts")]
   [SerializeField] private TMP_Text undoUsesText;
@@ -29,108 +29,108 @@ public class PowerUpManager : MonoBehaviour
   public event Action<int> OnShuffleUsesChanged;
 
   public struct BottleSnapshot
-  {
-    public Color[] colors;
-    public int     numberOfColors;
-  }
+    {
+      public Color[] colors;
+      public int numberOfColors;
+    }
 
   private struct MoveSnapshot
-  {
-    public BottleController source;
-    public BottleSnapshot   sourceSnap;
-    public BottleController target;
-    public BottleSnapshot   targetSnap;
-  }
+    {
+      public BottleController source;
+      public BottleSnapshot sourceSnap;
+      public BottleController target;
+      public BottleSnapshot targetSnap;
+    }
 
   private void Start()
-  {
-    ResetAllUses();
-  }
+    {
+      ResetAllUses();
+    }
 
   public void RecordMove(BottleController source, BottleController target)
-  {
-    moveHistory.Push(new MoveSnapshot
     {
-      source     = source,
-      sourceSnap = source.GetSnapshot(),
-      target     = target,
-      targetSnap = target.GetSnapshot()
-    });
-  }
+      moveHistory.Push(new MoveSnapshot
+        {
+          source = source,
+          sourceSnap = source.GetSnapshot(),
+          target = target,
+          targetSnap = target.GetSnapshot()
+        });
+    }
 
   public void UndoLastMove()
-  {
-    if (undoUses <= 0)          return;
-    if (moveHistory.Count == 0) return;
-    if (IsAnyBottleAnimating()) return;
+    {
+      if (undoUses <= 0) return;
+      if (moveHistory.Count == 0) return;
+      if (IsAnyBottleAnimating()) return;
 
-    MoveSnapshot snap = moveHistory.Pop();
+      MoveSnapshot snap = moveHistory.Pop();
 
-    snap.source.RestoreFromSnapshot(snap.sourceSnap);
-    snap.target.RestoreFromSnapshot(snap.targetSnap);
+      snap.source.RestoreFromSnapshot(snap.sourceSnap);
+      snap.target.RestoreFromSnapshot(snap.targetSnap);
 
-    undoUses--;
-    OnUndoUsesChanged?.Invoke(undoUses);
-    UpdateUsesTexts();
-  }
+      undoUses--;
+      OnUndoUsesChanged?.Invoke(undoUses);
+      UpdateUsesTexts();
+    }
 
   public void AddBottle()
-  {
-    if (addBottleUses <= 0) return;
+    {
+      if (addBottleUses <= 0) return;
 
-    levelManager.AddExtraBottle();
+      levelManager.AddExtraBottle();
 
-    addBottleUses--;
-    OnAddBottleUsesChanged?.Invoke(addBottleUses);
-    UpdateUsesTexts();
-  }
+      addBottleUses--;
+      OnAddBottleUsesChanged?.Invoke(addBottleUses);
+      UpdateUsesTexts();
+    }
 
   public void ShuffleSelectedBottle()
-  {
-    if (shuffleUses <= 0) return;
+    {
+      if (shuffleUses <= 0) return;
 
-    BottleController selected = inputHandler.SelectedBottle;
-    if (selected == null)     return;
-    if (selected.IsAnimating) return;
+      BottleController selected = inputHandler.SelectedBottle;
+      if (selected == null) return;
+      if (selected.IsAnimating) return;
 
-    selected.ShuffleColors();
+      selected.ShuffleColors();
 
-    shuffleUses--;
-    OnShuffleUsesChanged?.Invoke(shuffleUses);
-    UpdateUsesTexts();
-  }
+      shuffleUses--;
+      OnShuffleUsesChanged?.Invoke(shuffleUses);
+      UpdateUsesTexts();
+    }
 
   public void ResetAllUses()
-  {
-    undoUses      = maxUndoUses;
-    addBottleUses = maxAddBottleUses;
-    shuffleUses   = maxShuffleUses;
+    {
+      undoUses = maxUndoUses;
+      addBottleUses = maxAddBottleUses;
+      shuffleUses = maxShuffleUses;
 
-    moveHistory.Clear();
+      moveHistory.Clear();
 
-    OnUndoUsesChanged?.Invoke(undoUses);
-    OnAddBottleUsesChanged?.Invoke(addBottleUses);
-    OnShuffleUsesChanged?.Invoke(shuffleUses);
-    UpdateUsesTexts();
-  }
+      OnUndoUsesChanged?.Invoke(undoUses);
+      OnAddBottleUsesChanged?.Invoke(addBottleUses);
+      OnShuffleUsesChanged?.Invoke(shuffleUses);
+      UpdateUsesTexts();
+    }
 
   private void UpdateUsesTexts()
-  {
-    if (undoUsesText      != null) undoUsesText.text      = undoUses.ToString();
-    if (addBottleUsesText != null) addBottleUsesText.text = addBottleUses.ToString();
-    if (shuffleUsesText   != null) shuffleUsesText.text   = shuffleUses.ToString();
-  }
+    {
+      if (undoUsesText != null) undoUsesText.text = undoUses.ToString();
+      if (addBottleUsesText != null) addBottleUsesText.text = addBottleUses.ToString();
+      if (shuffleUsesText != null) shuffleUsesText.text = shuffleUses.ToString();
+    }
 
-  public int UndoUses      => undoUses;
+  public int UndoUses => undoUses;
   public int AddBottleUses => addBottleUses;
-  public int ShuffleUses   => shuffleUses;
+  public int ShuffleUses => shuffleUses;
 
   private bool IsAnyBottleAnimating()
-  {
-    foreach (BottleController b in levelManager.GetAllBottles())
     {
-      if (b != null && b.IsAnimating) return true;
+      foreach (BottleController b in levelManager.GetAllBottles())
+        {
+          if (b != null && b.IsAnimating) return true;
+        }
+      return false;
     }
-    return false;
-  }
 }
